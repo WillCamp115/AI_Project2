@@ -15,6 +15,7 @@
 from util import manhattanDistance
 from game import Directions
 import random, util
+import math
 
 from game import Agent
 
@@ -150,7 +151,46 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        v, action = self.maxx(gameState, None, 0, 0)
+        return action
+        
+    def maxx(self, gameState, action, depth, agentNum):
+        if gameState.isWin() or gameState.isLose() or depth == self.depth:
+            return self.evaluationFunction(gameState), action
+        
+        bestV = -math.inf
+        bestAction = None
+        for nextAction in gameState.getLegalActions(agentNum):
+            nextGameState = gameState.generateSuccessor(0, nextAction)
+            tempV, tempAction = self.minx(nextGameState, nextAction, depth, 1)
+            if tempV > bestV:
+                bestV = tempV
+                bestAction = tempAction
+        return bestV, bestAction
+        
+    def minx(self, gameState, action, depth, agentNum):
+        if gameState.isWin() or gameState.isLose() or depth == self.depth:
+            return self.evaluationFunction(gameState), action
+        if agentNum+1 == gameState.getNumAgents():
+            worstV = math.inf
+            for nextAction in gameState.getLegalActions(agentNum):
+                nextGameState = gameState.generateSuccessor(agentNum, nextAction)
+                tempV, tempAction = self.maxx(nextGameState, nextAction, depth+1, 0)
+                if tempV < worstV:
+                    worstV = tempV
+            return worstV, action
+        else:
+            worstV = math.inf
+            for nextAction in gameState.getLegalActions(agentNum):
+                nextGameState = gameState.generateSuccessor(agentNum, nextAction)
+                tempV, tempAction = self.minx(nextGameState, nextAction, depth, agentNum+1)
+                if tempV < worstV:
+                    worstV = tempV
+            return worstV, action
+
+        
+    
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
