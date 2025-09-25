@@ -263,11 +263,43 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
-        v,action = self.expectimax(self,gameState,0,0)
+        v,action = self.expectimax(gameState,None,0,0)
         return action
-    def expectimax(self,gameState,agent,depht):
-        #implement
-        a=0
+    def expectimax(self,gameState,action,depth,agentNum):
+        if gameState.isWin() or gameState.isLose() or depth == self.depth:
+            return self.evaluationFunction(gameState), None
+        if agentNum== 0:
+            return self.maxx(gameState,action,depth,agentNum)
+        else:
+            return self.evaluate(gameState,action,depth,agentNum)
+
+    def maxx(self, gameState, action, depth, agentNum):
+        bestV = -math.inf
+        bestAction = None
+        for nextAction in gameState.getLegalActions(agentNum):
+            nextGameState = gameState.generateSuccessor(agentNum, nextAction)
+            tempV, tempAction = self.expectimax(nextGameState, nextAction, depth,1)
+            if tempV > bestV:
+                bestV = tempV
+                bestAction = nextAction
+        return bestV, bestAction
+    
+    def evaluate(self,gameState,action,depth,agentNum):
+        v=0
+        for nextAction in gameState.getLegalActions(agentNum):
+            succ = gameState.generateSuccessor(agentNum, nextAction)
+            prob = 1/(len(gameState.getLegalActions(agentNum)))
+            if agentNum == gameState.getNumAgents()-1:
+                tempV=prob*(self.expectimax(succ,nextAction,depth+1,0)[0])
+                v+=tempV
+            else:
+                tempV=prob*(self.expectimax(succ,nextAction,depth,agentNum+1)[0])
+                v+=tempV
+        return v, None
+
+        
+        
+        
 
 def betterEvaluationFunction(currentGameState):
     """
