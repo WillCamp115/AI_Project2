@@ -202,7 +202,53 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        v, action = self.maxx(gameState, None, 0, 0 , float('-inf'), float("inf"))
+        return action
+        
+    def maxx(self, gameState, action, depth, agentNum ,a,b):
+        if gameState.isWin() or gameState.isLose() or depth == self.depth:
+            return self.evaluationFunction(gameState), action
+        
+        bestV = -math.inf
+        bestAction = None
+        for nextAction in gameState.getLegalActions(agentNum):
+            nextGameState = gameState.generateSuccessor(0, nextAction)
+            tempV, tempAction = self.minx(nextGameState, nextAction, depth, 1,a,b)
+            if tempV > bestV:
+                bestV = tempV
+                bestAction = tempAction
+            a= max(a,bestV)
+            if a>b:
+                return bestV,bestAction
+        return bestV, bestAction
+        
+    def minx(self, gameState, action, depth, agentNum,a,b):
+        if gameState.isWin() or gameState.isLose() or depth == self.depth:
+            return self.evaluationFunction(gameState), action
+        if agentNum+1 == gameState.getNumAgents():
+            worstV = math.inf
+            for nextAction in gameState.getLegalActions(agentNum):
+                nextGameState = gameState.generateSuccessor(agentNum, nextAction)
+                tempV, tempAction = self.maxx(nextGameState, nextAction, depth+1, 0,a,b)
+                if tempV < worstV:
+                    worstV = tempV
+                b= min(b,worstV)
+                if a>b:
+                    return worstV,action
+                
+            return worstV, action
+        else:
+            worstV = math.inf
+            for nextAction in gameState.getLegalActions(agentNum):
+                nextGameState = gameState.generateSuccessor(agentNum, nextAction)
+                tempV, tempAction = self.minx(nextGameState, nextAction, depth, agentNum+1,a,b)
+                if tempV < worstV:
+                    worstV = tempV
+                b= min(b,worstV)
+                if a > b :
+                    return worstV,action
+            return worstV, action
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
@@ -217,7 +263,11 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        v,action = self.expectimax(self,gameState,0,0)
+        return action
+    def expectimax(self,gameState,agent,depht):
+        #implement
+        a=0
 
 def betterEvaluationFunction(currentGameState):
     """
