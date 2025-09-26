@@ -307,9 +307,24 @@ def betterEvaluationFunction(currentGameState):
     evaluation function (question 5).
 
     DESCRIPTION: <write something here so we know what you did>
+    1) so my approach was to check the state and see all the foods and the ghost and the current situation
+    pacman is in. its reward based, for the closest 4 foods it gets +10 for each food but also gets a minor penalty for
+    all the food left.
+
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    if currentGameState.isWin():
+        return 1000+currentGameState.getScore()
+    if currentGameState.isWin():
+        return -1000
+    
+    pacPosition = currentGameState.getPacmanPosition()
+    foods = currentGameState.getFood().asList()
+    current_score=currentGameState.getScore()
+    ghost_states = currentGameState.getGhostStates()
 
+    food_Score =0
+    for food in foods():
+        closest_food = min(manhattanDistance(pacPosition,food))
 # Abbreviation
 better = betterEvaluationFunction
