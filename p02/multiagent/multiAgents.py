@@ -308,23 +308,52 @@ def betterEvaluationFunction(currentGameState):
 
     DESCRIPTION: <write something here so we know what you did>
     1) so my approach was to check the state and see all the foods and the ghost and the current situation
-    pacman is in. its reward based, for the closest 4 foods it gets +10 for each food but also gets a minor penalty for
+    pacman is in. its reward based, for the closest 4 foods it gets +10 based on how close they are for each food but also gets a minor penalty for
     all the food left.
+    2) for each ghost that is close to us there is a heavy penalty and for each scared ghost close to us we get a reward
 
     """
     "*** YOUR CODE HERE ***"
     if currentGameState.isWin():
         return 1000+currentGameState.getScore()
-    if currentGameState.isWin():
+    if currentGameState.isLose():
         return -1000
     
     pacPosition = currentGameState.getPacmanPosition()
     foods = currentGameState.getFood().asList()
     current_score=currentGameState.getScore()
     ghost_states = currentGameState.getGhostStates()
-
+    food_distances = []
     food_Score =0
-    for food in foods():
-        closest_food = min(manhattanDistance(pacPosition,food))
+    for food in foods:
+        food_distances.append(manhattanDistance(pacPosition,food))
+    food_Score = 10/ (sorted(food_distances)[0]+1)  # get a reward for the closest food you have
+    food_penalty = (len(foods)) # penalty for each food thats far and still left in this state
+
+    # for eahc ghost that is close to you and is not in scared state you get a penalty
+    #for each ghost that is close to you and is not in scared state gives you reward 
+
+    for ghost in ghost_states:
+        ghost_position = ghost.getPosition()
+        ghost_distance = manhattanDistance(pacPosition,ghost_position)
+        ghost_punishment = 0
+        ghost_reward = 0
+        # if ghost.s
+        if ghost.scaredTimer>0:
+            if ghost_distance<2:
+                ghost_reward+=200
+            elif ghost_distance<5:
+                ghost_reward+=50
+        else:
+            if ghost_distance<2:
+                ghost_punishment += 500
+            elif ghost_distance<5:
+                ghost_punishment += 100
+
+    return currentGameState.getScore()+food_Score - food_penalty - ghost_punishment
+
+
+    
+
 # Abbreviation
 better = betterEvaluationFunction
